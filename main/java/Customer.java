@@ -1,11 +1,11 @@
-public class Customers {
+public class Customer {
     private final double arrival;
     private final int items;
     private final int timeShopping;
 
-    public Customers(double arrival, int items, int timeShopping) {
+    public Customer(double arrival, int items, int timeShopping) {
         this.arrival = arrival;
         this.items = items;
-        this.timeShopping = timeShopping;
+        this.timeShopping = timeShopping * items;
     }
 }
