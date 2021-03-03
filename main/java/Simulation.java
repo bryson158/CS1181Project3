@@ -30,7 +30,8 @@ public class Simulation {
         return customers;
     }
 
-    //Runs the sim
+    //Runs the sim.
+    //TODO- Add a loop that runs the sim 12 times and adds an express lane each time
     public static void simClock() throws IOException {
         double simTime = 0.00;
         Queue events = new PriorityQueue();

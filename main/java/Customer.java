@@ -1,5 +1,3 @@
-import java.text.DecimalFormat;
-
 public class Customer {
     private final double arrival;
     private final int items;
