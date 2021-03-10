@@ -1,16 +1,11 @@
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.PriorityQueue;
-import java.util.Queue;
-import java.util.Scanner;
+import java.util.*;
 
 public class Simulation {
     public static void main(String[] args) throws IOException {
         simClock();
     }
-
-    ArrayList<Customer> allCustomers = new ArrayList<>();
 
     //Reads in the information from the text file
     public static ArrayList<Customer> readInCustomers() throws IOException {
@@ -20,6 +15,7 @@ public class Simulation {
 
         ArrayList<Customer> customers = new ArrayList<>();
 
+        //Creates a new customer for each line of text the file has.
         while (input.hasNext()){
             double arrivalTime = input.nextDouble();
             int numItems = input.nextInt();
@@ -31,9 +27,10 @@ public class Simulation {
     }
 
     //Runs the sim.
-    //TODO- Add a loop that runs the sim 12 times and adds an express lane each time
     public static void simClock() throws IOException {
         double simTime = 0.00;
+
+        //Queue that tracks the events by time that they will happen
         Queue events = new PriorityQueue();
 
         //List for the customers in the store.
@@ -43,8 +40,27 @@ public class Simulation {
         ArrayList<Customer> allCustomersForDay = new ArrayList<>();
         allCustomersForDay = readInCustomers();
 
+        //Sorts the customers by the time that they arrive at the store
+        //allCustomersForDay.sort(Comparator.comparingDouble(Customer::getArrival));
+
+        for (Customer c: allCustomersForDay) {
+            events.add(c.getArrival());
+            events.add(c.getCheckoutTime());
+        }
+
+
+
+        /*
         for (Customer c: allCustomersForDay) {
             System.out.println(c.toString());
+        } */
+
+        for(int i = 1; i < 11; i++){
+            for(int j =0; j < 12; j++){
+                for (int p=0; p<i; p++, j++){
+
+                }
+            }
         }
     }
 }
