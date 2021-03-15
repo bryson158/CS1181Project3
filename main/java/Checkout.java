@@ -13,9 +13,6 @@ public class Checkout {
         this.isOpen = isOpen;
     }
 
-    //TODO- Add code to check if register is able to close to prevent register from closing while a customer might be
-    // in line
-
     public int checkoutLineLength(){
         return checkoutLineQueue.size();
     }
