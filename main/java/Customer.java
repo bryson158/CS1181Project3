@@ -38,11 +38,11 @@ public class Customer {
         this.checkoutTime = checkoutTime;
     }
 
-    public double getDepartureTime(){
+    public double getDepartureTime() {
         return departureTime;
     }
 
-    public void setDepartureTime(double departureTime){
+    public void setDepartureTime(double departureTime) {
         this.departureTime = departureTime;
     }
 

@@ -1,0 +1,21 @@
+1.19: Customer Arrival 381
+1.36: Customer Arrival 2298
+1.86: Customer Arrival 933
+2.12: Customer Arrival 2673
+2.21: Finished Shopping Customer 3811
+More than 12, Chose Lane 4 (0)
+2.26: Customer Arrival 1944
+2.32: Customer Arrival 550
+2.35: Finished Shopping Customer 22981
+12 or fewer items 0 (0)
+1 (0)
+2 (0)
+3 (0)
+2.45: Customer Arrival 2478
+2.63: Customer Arrival 1360
+2.63: Customer Arrival 1360
+2.73: Finished Shopping Customer 7171
+More than 12, Chose Lane 5 (0)
+2.86: Customer Arrival 2297
+3.01: Finished Shopping Customer 26731
+More than 12, Chose Lane 6 (0)

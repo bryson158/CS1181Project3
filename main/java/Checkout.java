@@ -1,36 +1,37 @@
-import java.util.LinkedList;
-import java.util.Queue;
+import java.util.ArrayList;
 
 public class Checkout {
     //Include distinction between the express and non express lanes
-    private Queue<Customer> checkoutLineQueue = new LinkedList();
-    private final Boolean isExpress;
-    private double checkoutTime;
-    private boolean isOpen;
+    private ArrayList<Double> checkoutTimes= new ArrayList<>();
+    private Boolean isExpress;
 
-    public Checkout(Boolean isExpress, boolean isOpen) {
+    public Checkout(Boolean isExpress) {
         this.isExpress = isExpress;
-        this.isOpen = isOpen;
     }
 
-    public int checkoutLineLength(){
-        return checkoutLineQueue.size();
+    //Returns the size of the array list
+    public int getCheckoutLineSize (){
+        return checkoutTimes.size();
     }
 
-    //This is the method the constructor uses to determine the amount of time per item it will take to checkout a
-    // customer
-    public void setCheckoutTime(boolean isExpress) {
-        if(isExpress){
-            //Time in minutes
-            this.checkoutTime = 0.1;
+    //Removes a time from the arrayList
+    public void removeTimeFromCheckoutLine (double time){
+        checkoutTimes.remove(time);
+        checkoutTimes.sort(Double::compareTo);
+    }
+
+    public void addCustomerToCheckoutLine(Customer c){
+        double finalCheckoutTime = 0;
+        if(checkoutTimes.size() != 0){
+            for(int i = 0; i < checkoutTimes.size(); i++){
+                
+            }
         }
-        else {
-            //Time in minutes
-            this.checkoutTime = 0.05;
-        }
     }
 
-    public void addCustomerToCheckoutLineQueue(Customer c){
-        checkoutLineQueue.add(c);
+    public boolean getIsExpress(){
+        return isExpress;
     }
+
+
 }

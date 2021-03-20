@@ -1,14 +1,15 @@
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.PriorityQueue;
 import java.util.Scanner;
 
 public class Simulation {
     public static void main(String[] args) throws IOException {
-        simClock();
+        /*for(int i = 0; i < 11; i++){
+            simClock(i);
+        }*/
+
+        simClock(4);
     }
 
     //Reads in the information from the text file
@@ -31,7 +32,7 @@ public class Simulation {
     }
 
     //Runs the sim.
-    public static void simClock() throws IOException {
+    public static void simClock(int expressRegisters) throws IOException {
 
         //Queue that tracks the events by time that they will happen
         //PriorityQueue<Double> events = new PriorityQueue(double times, Comparable);
@@ -44,16 +45,14 @@ public class Simulation {
         allCustomersForDay = readInCustomers();
 
         //Sorts the customers by the time that they arrive at the store
-        allCustomersForDay.sort(Comparator.comparingDouble(Customer::getArrival));
+        //allCustomersForDay.sort(Comparator.comparingDouble(Customer::getArrival));
 
         /*for (Customer c: allCustomersForDay) {
             System.out.println(c.toString());
         }*/
-
+        //TODO- try changing to relative path
+        File outputFile = new File("G:\\CS1181\\Lab\\Projects\\Project 3\\src\\main\\java\\Output"+ expressRegisters  +".txt");
         try{
-            //TODO- try changing to relative path
-            File outputFile = new File("G:\\CS1181\\Lab\\Projects\\Project 3\\src\\main\\java\\Output.txt");
-
             if(outputFile.createNewFile()){
                 System.out.println(outputFile + " created");
             }
@@ -62,10 +61,12 @@ public class Simulation {
             System.out.println(e);
         }
 
+        PrintWriter outputWriter = new PrintWriter(new BufferedWriter(new FileWriter(outputFile)));
+
         double simTime = 0.0;
 
         //Tracks the time that customers should finish shopping by
-        PriorityQueue<Double> customersDoneShoppingTime = new PriorityQueue<Double>();
+        //PriorityQueue<Double> customersDoneShoppingTime = new PriorityQueue<Double>();
 
         //Queue for tracking the next time coming up
         PriorityQueue<Double> allTimes = new PriorityQueue<>();
@@ -75,37 +76,164 @@ public class Simulation {
             allTimes.add(c.getCheckoutTime());
         }
 
-        ArrayList<Customer> customersSortedByCheckoutTime = allCustomersForDay;
+        //List of customers being sorted by their times of arriving at a register
+        //ArrayList<Customer> customersSortedByCheckoutTime = allCustomersForDay;
 
-        customersSortedByCheckoutTime.sort(Comparator.comparingDouble(Customer::getCheckoutTime));
+        //customersSortedByCheckoutTime.sort(Comparator.comparingDouble(Customer::getCheckoutTime));
 
-        //TODO- Make loop for the registers being created.
+        //List of registers
+        ArrayList<Checkout> registers = new ArrayList<>();
+
+        //Creates all of the registers needed for the sim
+        for(int i = 0; i < expressRegisters; i++){
+            registers.add(new Checkout(true));
+        }
+
+        while(registers.size() < 12){
+            registers.add(new Checkout(false));
+        }
 
         //loop for increasing the time in the sim
-        while (simTime < allCustomersForDay.get(allCustomersForDay.size()-1).getCheckoutTime() + 1){
-            //TODO- evaluate if this if statement is needed.
-            /*if(customersInStore.size() < 1){
-                customersInStore.add(allCustomersForDay.get(0));
-                customersDoneShoppingTime.add(allCustomersForDay.get(0).getTimeShopping());
-                simTime = customersInStore.get(0).getArrival();
-                allCustomersForDay.remove(0);
+        while(allCustomersForDay.size() > 0){
+            for (int i = 0; i < allCustomersForDay.size(); i++ ) {
+                //Checks if the arrival of the indexed customer is the next event
+                if(allCustomersForDay.get(i).getArrival() == allTimes.peek()){
+                    simTime = allTimes.poll();
 
-                System.out.println("Sim time changed to " + simTime);
-            }*/
+                    outputWriter.write(simTime + ": Customer Arrival " + i + "\n");
 
-            simTime = allTimes.peek();
-            System.out.println("Time now " + simTime);
-            allTimes.remove(simTime);
+                    break;
 
-            if(allCustomersForDay.get(0).getArrival() == simTime){
-                //Removes the customers from the all customers list sorted by the earliest arrival time
-                customersInStore.add(allCustomersForDay.get(0));
-                allCustomersForDay.remove(0);
-            }
-            else if(customersSortedByCheckoutTime.get(0).getCheckoutTime() == simTime){
-                customersSortedByCheckoutTime.
-                //Removes the customer from the checkout time list sorted by the earliest checkout times
-                customersSortedByCheckoutTime.remove(0);
+                }
+
+                //Checks if the indexed customer's checkout time is the current time
+                else if(allCustomersForDay.get(i).getCheckoutTime() == allTimes.peek()){
+                    simTime = allTimes.poll();
+
+                    outputWriter.write(simTime + ": Finished Shopping Customer " + i+1 +"\n");
+
+                    //This logic block is used if the customer isn't elegible for express lane
+                    if(allCustomersForDay.get(i).getItems() > 12){
+                        outputWriter.write("More than 12, Chose Lane ");
+
+                        PriorityQueue<Integer> checkoutLengths = new PriorityQueue<>();
+
+                        for(int p = 0; p < registers.size(); p++){
+                            //Will not add the register to the queue of line length since the register is an express lane
+                            if(registers.get(p).getIsExpress()){
+                                continue;
+                            }
+                            else {
+                                checkoutLengths.add(registers.get(p).getCheckoutLineSize());
+                            }
+                        }
+
+                        for(int p = 0; p < registers.size(); p++){
+                            //Since customer has more than 12 items they cannot use an express lane and express lanes
+                            //should be ignored
+                            if(registers.get(p).getIsExpress()){
+                                continue;
+                            }
+                            else {
+                                //Only used if the length of the line is 0
+
+                                //
+                                if (registers.get(p).getCheckoutLineSize() == checkoutLengths.peek() &&
+                                        checkoutLengths.peek() == 0) {
+                                    //Adds the time the customer will be finished checking out to the queues
+                                    allCustomersForDay.get(i).setDepartureTime(allCustomersForDay.get(i).getCheckoutTime() +
+                                            (allCustomersForDay.get(i).getItems() * .05) + 2);
+                                    allTimes.add(allCustomersForDay.get(i).getDepartureTime());
+                                    outputWriter.write(p + " (" + registers.get(p).getCheckoutLineSize() + ")\n");
+                                    registers.get(p).addCustomerToCheckoutLine(allCustomersForDay.get(i));
+                                    outputWriter.flush();
+
+                                    allTimes.poll();
+
+                                    break;
+                                }
+                                //Used if this register is the one with the shortest line
+                                else if (registers.get(p).getCheckoutLineSize() == checkoutLengths.peek()) {
+                                    outputWriter.write(p + " (" + registers.get(p).getCheckoutLineSize() + ")\n");
+                                    registers.get(p).addCustomerToCheckoutLine(allCustomersForDay.get(i));
+                                    outputWriter.flush();
+
+                                    allTimes.poll();
+                                    break;
+                                }
+                            }
+                        }
+
+
+                    }
+                    else {
+                        outputWriter.write("12 or fewer items ");
+
+                        PriorityQueue<Integer> checkoutLengths = new PriorityQueue<>();
+
+                        for(int p = 0; registers.size() > p; p++){
+                            checkoutLengths.add(registers.get(p).getCheckoutLineSize());
+                        }
+
+                        boolean done = false;
+
+                        while (!done) {
+                            for (int p = 0; registers.size() > p; p++) {
+                                for (int j = 0; j < expressRegisters; j++) {
+                                    //Only uses this if the line is empty
+                                    if (registers.get(j).getCheckoutLineSize() == 0) {
+                                        allTimes.add(allCustomersForDay.get(j).getCheckoutTime() + (
+                                                allCustomersForDay.get(i).getItems() * .1) + 1);
+                                        registers.get(j).addCustomerToCheckoutLine(allCustomersForDay.get(i));
+
+                                        outputWriter.write(j + " (" + checkoutLengths.peek() + ")" + "\n");
+                                        outputWriter.flush();
+                                        done = true;
+                                        break;
+                                    }
+                                    else if (registers.get(j).getCheckoutLineSize() == checkoutLengths.peek()) {
+                                        registers.get(j).addCustomerToCheckoutLine(allCustomersForDay.get(i));
+
+                                        //Writes to the output file the register picked and the length of the line
+                                        outputWriter.write(j + " (" + checkoutLengths.peek() + ")" + "\n");
+                                        outputWriter.flush();
+                                        done = true;
+                                        break;
+                                    }
+                                }
+                                if (checkoutLengths.peek() == 0) {
+
+                                }
+                            }
+
+                            for (int j = 0; j < expressRegisters; j++) {
+                                //Only uses this if the line is empty
+                                if (registers.get(j).getCheckoutLineSize() == 0) {
+                                    allTimes.add(allCustomersForDay.get(j).getCheckoutTime() + (
+                                            allCustomersForDay.get(i).getItems() * .1) + 1);
+                                    registers.get(j).addCustomerToCheckoutLine(allCustomersForDay.get(i));
+
+                                    outputWriter.write(j + " (" + checkoutLengths.peek() + ")" + "\n");
+                                    outputWriter.flush();
+                                    done = true;
+                                    break;
+                                }
+                                else if (registers.get(j).getCheckoutLineSize() == checkoutLengths.peek()) {
+                                    registers.get(j).addCustomerToCheckoutLine(allCustomersForDay.get(i));
+
+                                    //Writes to the output file the register picked and the length of the line
+                                    outputWriter.write(j + " (" + checkoutLengths.peek() + ")" + "\n");
+                                    outputWriter.flush();
+                                    done = true;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+
+                //Checks if the next time in the queue is a time for a checkout
+
             }
         }
     }
